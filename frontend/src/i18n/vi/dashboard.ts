@@ -1797,6 +1797,7 @@ export default {
   'tool_name_patch_episode_meta': 'Sửa tiêu đề tập',
   'tool_name_patch_project': 'Sửa tài sản dự án',
   'tool_name_rename_asset': 'Đổi tên tài sản',
+  'tool_name_delete_asset': 'Xóa tài sản',
   'tool_name_retry_project_migration': 'Thử lại nâng cấp dữ liệu',
 
   // Biểu ngữ nâng cấp dữ liệu thất bại (đầu StudioLayout)

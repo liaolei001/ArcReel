@@ -17,6 +17,7 @@ from lib.project_manager import ProjectManager
 from lib.reference_video.request_projection import unit_reference_declarations
 from lib.script_batch_edit import script_revision
 from server.agent_runtime.sdk_tools.content_read import get_episode_script_tool
+from server.agent_runtime.sdk_tools.delete_asset import delete_asset_tool
 from server.agent_runtime.sdk_tools.patch_episode_meta import patch_episode_meta_tool
 from server.agent_runtime.sdk_tools.patch_project import patch_project_tool
 from server.agent_runtime.sdk_tools.patch_script import patch_episode_script_tool
@@ -1761,3 +1762,22 @@ class TestRenameAssetTool:
         assert out.get("is_error") is True
         assert "冲突" in _text(out)
         assert "角色A" in rename_ctx.pm.load_project("demo")["characters"]
+
+
+class TestDeleteAssetTool:
+    async def test_delete_asset_removes_project_entry(self, ctx: ToolContext) -> None:
+        ctx.pm.upsert_assets("demo", "characters", {"Hero": {"description": "main"}})
+        out = await _call(delete_asset_tool(ctx), {"table": "characters", "name": "Hero"})
+        assert out.get("is_error") is not True
+        assert "Hero" not in ctx.pm.load_project("demo")["characters"]
+        assert "asset_delete" in out["content"][0]["text"]
+
+    async def test_delete_asset_rejects_missing_asset(self, ctx: ToolContext) -> None:
+        out = await _call(delete_asset_tool(ctx), {"table": "characters", "name": "不存在"})
+        assert out.get("is_error") is True
+        assert "不存在" in _text(out)
+
+    async def test_delete_asset_rejects_invalid_name(self, ctx: ToolContext) -> None:
+        out = await _call(delete_asset_tool(ctx), {"table": "characters", "name": "../逃逸"})
+        assert out.get("is_error") is True
+        assert "invalid_request" in out["content"][0]["text"]

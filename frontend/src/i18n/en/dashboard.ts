@@ -1659,6 +1659,7 @@ export default {
   'tool_name_patch_episode_meta': 'Edit episode title',
   'tool_name_patch_project': 'Edit project assets',
   'tool_name_rename_asset': 'Rename asset',
+  'tool_name_delete_asset': 'Delete asset',
   'tool_name_retry_project_migration': 'Retry data upgrade',
 
   // Failed data upgrade banner (top of StudioLayout)

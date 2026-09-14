@@ -46,6 +46,7 @@ export default {
   "project_count": "{{count}} 个项目",
   "delete_confirm": "确定删除这个{{type}}？图片也会被删除",
   "delete_confirm_with_audio": "确定删除这个{{type}}？图片与参考音频也会被删除",
+  "delete_project_confirm": "确定删除这个{{type}}？项目资产及其生成文件都会被删除。",
   "from_library": "从资产库选择",
   "picker_title_character": "从资产库选择角色",
   "picker_title_scene": "从资产库选择场景",

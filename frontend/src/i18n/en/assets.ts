@@ -44,6 +44,7 @@ export default {
   "project_count": "{{count}} projects",
   "delete_confirm": "Delete this {{type}}? Its image will also be removed.",
   "delete_confirm_with_audio": "Delete this {{type}}? Its image and reference audio will also be removed.",
+  "delete_project_confirm": "Delete this {{type}}? Its project asset and generated files will be removed.",
   "from_library": "From Library",
   "picker_title_character": "Select Characters from Library",
   "picker_title_scene": "Select Scenes from Library",

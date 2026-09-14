@@ -56,6 +56,7 @@ from server.tool_runtime import (
     CompleteAssetInventoryRequest,
     CompleteScriptPlanRebuildRequest,
     CreateProjectToolRequest,
+    DeleteAssetRequest,
     GenerationBatchToolRequest,
     PatchEpisodeMetaRequest,
     PatchEpisodeScriptOperation,
@@ -78,6 +79,7 @@ from server.tool_runtime import (
     confirm_script_review,
     convert_script_plan,
     create_project,
+    delete_asset,
     discard_draft,
     generate_episode_script,
     generate_script_plan,
@@ -793,6 +795,18 @@ def build_remote_mcp_server(
             return _to_mcp_result("asset_rename", ToolOutcome(problem=ToolProblem("invalid_request", str(exc))))
         return _to_mcp_result(
             "asset_rename", await rename_asset(ToolRequest(request), scope, _authenticated_caller(), services)
+        )
+
+    @server.tool(name="delete_asset", structured_output=False)
+    async def remote_delete_asset(project: str, table: str, name: str) -> CallToolResult:  # pyright: ignore[reportUnusedFunction]
+        """Transactionally delete one project asset and its project artifacts."""
+        try:
+            scope = _project_scope(project, projects)
+            request = DeleteAssetRequest(table=table, name=name)
+        except (FileNotFoundError, ValueError) as exc:
+            return _to_mcp_result("asset_delete", ToolOutcome(problem=ToolProblem("invalid_request", str(exc))))
+        return _to_mcp_result(
+            "asset_delete", await delete_asset(ToolRequest(request), scope, _authenticated_caller(), services)
         )
 
     @server.tool(name="retry_project_migration", structured_output=False)

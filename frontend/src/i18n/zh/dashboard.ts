@@ -1658,6 +1658,7 @@ export default {
   'tool_name_patch_episode_meta': '编辑分集标题',
   'tool_name_patch_project': '编辑项目资产',
   'tool_name_rename_asset': '重命名资产',
+  'tool_name_delete_asset': '删除资产',
   'tool_name_retry_project_migration': '重试数据升级',
 
   // 数据升级失败条幅（StudioLayout 顶部）

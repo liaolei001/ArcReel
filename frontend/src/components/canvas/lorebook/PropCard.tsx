@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback, useId } from "react";
 import { useTranslation } from "react-i18next";
-import { Package, Upload } from "lucide-react";
+import { Package, Trash2, Upload } from "lucide-react";
 import { API } from "@/api";
 import { AddToLibraryButton } from "@/components/assets/AddToLibraryButton";
 import { ImageEditButton } from "@/components/canvas/timeline/ImageEditButton";
@@ -25,6 +25,7 @@ interface PropCardProps {
   projectName: string;
   onUpdate: (name: string, updates: Partial<Prop>) => void;
   onGenerate: (name: string) => void;
+  onDelete?: (name: string) => void;
   onRestoreVersion?: () => void | Promise<void>;
   onReload?: () => void | Promise<unknown>;
   generating?: boolean;
@@ -50,6 +51,7 @@ export function PropCard({
   projectName,
   onUpdate,
   onGenerate,
+  onDelete,
   onRestoreVersion,
   onReload,
   generating = false,
@@ -214,6 +216,11 @@ export function PropCard({
             iconOnly
             busy={generating || uploadingSheet}
           />
+          <button type="button" onClick={() => onDelete?.(name)} disabled={generating || uploadingSheet}
+            title={t("assets:delete")} aria-label={t("assets:delete")}
+            className="focus-ring inline-flex h-7 w-7 items-center justify-center rounded-md text-[var(--color-text-3)] transition-colors hover:text-[var(--color-warm-bright)] disabled:cursor-not-allowed disabled:opacity-40">
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
         </div>
         )}
       </div>

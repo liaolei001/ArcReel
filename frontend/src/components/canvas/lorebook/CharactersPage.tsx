@@ -5,6 +5,7 @@ import { GalleryToolbar } from "./GalleryToolbar";
 import { CharacterCard } from "./CharacterCard";
 import { AssetFormModal } from "@/components/assets/AssetFormModal";
 import { AssetPickerModal } from "@/components/assets/AssetPickerModal";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { API } from "@/api";
 import { useAppStore } from "@/stores/app-store";
 import { useScrollTarget } from "@/hooks/useScrollTarget";
@@ -32,6 +33,8 @@ export function CharactersPage({ projectName, characters, onSaveCharacter, onGen
   const { t } = useTranslation(["dashboard", "assets"]);
   const [adding, setAdding] = useState(false);
   const [picking, setPicking] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useScrollTarget("character");
 
@@ -50,6 +53,20 @@ export function CharactersPage({ projectName, characters, onSaveCharacter, onGen
       useAppStore.getState().pushToast(errMsg(err), "error");
     } finally {
       setPicking(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteTarget || deleting) return;
+    setDeleting(true);
+    try {
+      await API.deleteCharacter(projectName, deleteTarget);
+      setDeleteTarget(null);
+      await onRefreshProject?.();
+    } catch (err) {
+      useAppStore.getState().pushToast(errMsg(err), "error");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -79,6 +96,7 @@ export function CharactersPage({ projectName, characters, onSaveCharacter, onGen
                 onGenerate={onGenerateCharacter}
                 onRestoreVersion={onRestoreCharacterVersion}
                 onReload={onRefreshProject}
+                onDelete={() => setDeleteTarget(name)}
                 generating={generatingCharacterNames?.has(name)}
                 voiceBinding={voiceBinding}
                 readOnly={readOnly}
@@ -108,6 +126,21 @@ export function CharactersPage({ projectName, characters, onSaveCharacter, onGen
           onImport={(ids) => { void handleImport(ids); }}
         />
       )}
+
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        tone="danger"
+        title={t("assets:delete_project_confirm", { type: t("dashboard:characters") })}
+        description={deleteTarget ? <span className="font-mono">「{deleteTarget}」</span> : null}
+        confirmLabel={t("assets:delete")}
+        loadingLabel={t("assets:loading")}
+        cancelLabel={t("assets:cancel")}
+        loading={deleting}
+        onConfirm={() => void handleDelete()}
+        onCancel={() => {
+          if (!deleting) setDeleteTarget(null);
+        }}
+      />
     </div>
   );
 }

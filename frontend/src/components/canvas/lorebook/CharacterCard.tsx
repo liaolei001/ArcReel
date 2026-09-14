@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ImagePlus, Pause, Play, Upload, User, X } from "lucide-react";
+import { ImagePlus, Pause, Play, Trash2, Upload, User, X } from "lucide-react";
 import { API } from "@/api";
 import { AddToLibraryButton } from "@/components/assets/AddToLibraryButton";
 import { ImageEditButton } from "@/components/canvas/timeline/ImageEditButton";
@@ -41,6 +41,7 @@ interface CharacterCardProps {
   projectName: string;
   onSave: (name: string, payload: CharacterSavePayload) => Promise<void>;
   onGenerate: (name: string) => void;
+  onDelete?: (name: string) => void;
   onRestoreVersion?: () => Promise<void> | void;
   onReload?: () => Promise<unknown> | void;
   generating?: boolean;
@@ -88,6 +89,7 @@ export function CharacterCard({
   projectName,
   onSave,
   onGenerate,
+  onDelete,
   onRestoreVersion,
   onReload,
   generating = false,
@@ -431,6 +433,11 @@ export function CharacterCard({
             iconOnly
             busy={generating || uploadingSheet}
           />
+          <button type="button" onClick={() => onDelete?.(name)} disabled={generating || uploadingSheet || saving || deletingAudio}
+            title={t("assets:delete")} aria-label={t("assets:delete")}
+            className="focus-ring inline-flex h-7 w-7 items-center justify-center rounded-md text-[var(--color-text-3)] transition-colors hover:text-[var(--color-warm-bright)] disabled:cursor-not-allowed disabled:opacity-40">
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
         </div>
         )}
       </div>

@@ -1723,6 +1723,32 @@ class RenameAssetResult(ToolMessage):
     files: int
 
 
+class DeleteAssetRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    table: str
+    name: str
+
+    @field_validator("table")
+    @classmethod
+    def _validate_table(cls, value: str) -> str:
+        if value not in ASSET_TABLES:
+            raise ValueError(f"table 必须是 {list(ASSET_TABLES)} 之一")
+        return value
+
+    @field_validator("name")
+    @classmethod
+    def _validate_name(cls, value: str) -> str:
+        from lib.asset_types import validate_asset_name
+
+        return validate_asset_name(value)
+
+
+class DeleteAssetResult(ToolMessage):
+    table: str
+    name: str
+
+
 class RetryProjectMigrationResult(ToolMessage):
     workflow_plan: WorkflowPlan
 
@@ -2322,6 +2348,26 @@ async def rename_asset(
     )
 
 
+async def delete_asset(
+    request: ToolRequest[DeleteAssetRequest],
+    scope: ProjectScope,
+    _caller: CallerContext,
+    services: Services,
+) -> ToolOutcome[DeleteAssetResult]:
+    value = request.value
+    try:
+        await _run_sync_transaction(services.projects.delete_asset, scope.project_name, value.table, value.name)
+    except Exception as exc:
+        return ToolOutcome(problem=_unexpected("delete_asset", exc))
+    return ToolOutcome(
+        value=DeleteAssetResult(
+            message=f"已删除 {value.table} 资产 {value.name!r}及其项目产物。",
+            table=value.table,
+            name=value.name,
+        )
+    )
+
+
 async def retry_project_migration(
     _request: ToolRequest[None],
     scope: ProjectScope,
@@ -2448,6 +2494,8 @@ __all__ = [
     "CompleteAssetInventoryRequest",
     "CompleteScriptPlanRebuildRequest",
     "CreateProjectToolRequest",
+    "DeleteAssetRequest",
+    "DeleteAssetResult",
     "DiscardDraftRequest",
     "DraftLocator",
     "EpisodeScriptContent",
@@ -2482,6 +2530,7 @@ __all__ = [
     "complete_script_plan_rebuild",
     "confirm_script_review",
     "create_project",
+    "delete_asset",
     "discard_draft",
     "generate_episode_script",
     "generate_script_plan",

@@ -28,6 +28,7 @@ from server.agent_runtime.sdk_tools.content_read import (
     list_source_files_tool,
     read_project_file_tool,
 )
+from server.agent_runtime.sdk_tools.delete_asset import delete_asset_tool
 from server.agent_runtime.sdk_tools.enqueue_assets import (
     generate_assets_tool,
     list_pending_assets_tool,
@@ -119,13 +120,14 @@ ARCREEL_MCP_TOOL_IDS: tuple[str, ...] = (
     "patch_episode_meta",
     "patch_project",
     "rename_asset",
+    "delete_asset",
     "retry_project_migration",
 )
 
 # Tools wrapped at registration so they report the verdict instead of running while the
 # project's schema migration verdict is a failure. Everything that generates output or
 # writes script content is named here; the controlled project/metadata editors
-# (``patch_project``, ``patch_episode_meta``, ``rename_asset``) are not, because
+# (``patch_project``, ``patch_episode_meta``, ``rename_asset``, ``delete_asset``) are not, because
 # repairing is done through them. The exception belongs to this MCP repair channel
 # alone and does not carry over to REST: a route that writes script content stays
 # behind ``require_project_migration_ok`` rather than inheriting this exemption.
@@ -232,6 +234,7 @@ def build_arcreel_mcp_server(*, project_name: str, projects_root: Path, user_id:
         patch_episode_meta_tool(ctx),
         patch_project_tool(ctx),
         rename_asset_tool(ctx),
+        delete_asset_tool(ctx),
         retry_project_migration_tool(ctx),
     ]
     return create_sdk_mcp_server(
